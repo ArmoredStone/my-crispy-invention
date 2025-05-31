@@ -1,14 +1,20 @@
 import os
 
+from api_calls.call_grok import create_client, generate_image
+
 from dotenv import load_dotenv
 from openai import OpenAI
 
-XAI_API_KEY = os.environ.get("XAI_API_KEY")
-client = OpenAI(base_url="https://api.x.ai/v1", api_key=XAI_API_KEY)
+def load_api_key():
+    load_dotenv()
+    XAI_API_KEY = os.environ.get("XAI_API_KEY")
+    return XAI_API_KEY
 
-response = client.images.generate(
-  model="grok-2-image-1212",
-  prompt="A cat in a tree"
-)
+def main():
+    client = create_client(load_api_key())
+    response = generate_image(client)
+    print(response)
+    print(response.data[0].url)
 
-print(response.data)
+if __name__=="__main__":
+    main()
