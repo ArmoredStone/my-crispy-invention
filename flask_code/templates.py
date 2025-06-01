@@ -13,6 +13,7 @@ TRANSACTIONS_TEMPLATE: Final = """
         th { background-color: #f2f2f2; }
         tr:nth-child(even) { background-color: #f9f9f9; }
         tr:hover { background-color: #f5f5f5; }
+        .result-image { max-width: 200px; max-height: 200px; object-fit: contain; }
     </style>
 </head>
 <body>
@@ -32,7 +33,7 @@ TRANSACTIONS_TEMPLATE: Final = """
             <td>{{ transaction.author }}</td>
             <td>{{ transaction.prompt }}</td>
             <td>{{ transaction.revised_prompt }}</td>
-            <td><a href="{{ transaction.result_image_url }}" target="_blank">View Image</a></td>
+            <td><img src="{{ transaction.result_image_url }}" alt="Generated image" class="result-image"></td>
             <td>{{ transaction.created_at }}</td>
         </tr>
         {% endfor %}

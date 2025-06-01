@@ -25,4 +25,5 @@ dependencies = [
     "tqdm==4.67.1",
     "typing-extensions==4.13.2",
     "typing-inspection==0.4.1",
+    "gunicorn==21.2.0",
 ]

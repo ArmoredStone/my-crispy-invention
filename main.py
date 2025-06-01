@@ -1,6 +1,6 @@
 from api_calls.transaction_handler import TransactionHandler
 from database.crud import TransactionCRUD
-from flask_code.flask_app import flask_main
+from flask_code.wsgi import flask_main
 
 def main():
     # Create and execute transaction with default prompt
@@ -15,4 +15,5 @@ def main():
 
 if __name__ == "__main__":
     # main()
-    flask_main()
+    app = flask_main()
+    app.run(debug=True, host='0.0.0.0', port=5000)
