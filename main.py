@@ -1,7 +1,6 @@
-# Local application imports
 from api_calls.transaction_handler import TransactionHandler
 from database.crud import TransactionCRUD
-from database.database import get_db_session
+from flask_code.flask_app import flask_main
 
 def main():
     # Create and execute transaction with default prompt
@@ -15,4 +14,5 @@ def main():
         print("Transaction failed to complete")
 
 if __name__ == "__main__":
-    main()
+    # main()
+    flask_main()
