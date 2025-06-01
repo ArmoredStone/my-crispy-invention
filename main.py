@@ -1,23 +1,18 @@
-
-from api_calls.call_grok import create_client, generate_image
-from config.static import load_api_key
-from config.sqlalchemy_models import Transaction
-
-from openai import OpenAI
+# Local application imports
+from api_calls.transaction_handler import TransactionHandler
+from database.crud import TransactionCRUD
+from database.database import get_db_session
 
 def main():
-    #Create transaction object
-    transaction = Transaction()
+    # Create and execute transaction with default prompt
+    handler = TransactionHandler()
+    success = handler.execute()
+    if success:
+        transaction = TransactionCRUD.get_transaction_values(handler.transaction_id)
+        print(transaction)
+        print(f"Transaction completed successfully!")
+    else:
+        print("Transaction failed to complete")
 
-    #Process the prompt to API call
-    client = create_client(load_api_key())
-    response = generate_image(client, transaction.prompt)
-
-    #Update transaction object
-    transaction.update_result_image_url(response.data[0].url)
-    transaction.update_revised_prompt(response.data[0].revised_prompt)
-    print(transaction.is_complete())
-    print(transaction.__repr__())
-
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
