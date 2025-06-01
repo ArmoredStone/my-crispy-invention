@@ -1,7 +1,7 @@
 
 from api_calls.call_grok import create_client, generate_image
 from config.static import load_api_key
-from config.models import Transaction
+from config.sqlalchemy_models import Transaction
 
 from openai import OpenAI
 
