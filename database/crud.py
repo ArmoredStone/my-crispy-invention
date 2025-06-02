@@ -22,21 +22,32 @@ class TransactionCRUD:
 
     @staticmethod
     def get_all_transactions_values() -> List[Transaction]:
-        """Get all transactions."""
+        """Get all transactions, ordered by ID in descending order (newest first)."""
         with get_db_session() as session:
-            return [get_transaction_dict(transaction) for transaction in session.query(Transaction).all()]
+            return [get_transaction_dict(transaction) for transaction in 
+                   session.query(Transaction)
+                   .order_by(Transaction.id.desc())
+                   .all()]
     
     @staticmethod
     def get_all_transactions_values_by_page(page: int, page_size: int) -> List[Transaction]:
-        """Get all transactions by page."""
+        """Get all transactions by page, ordered by ID in descending order (newest first)."""
         with get_db_session() as session:
-            return [get_transaction_dict(transaction) for transaction in session.query(Transaction).offset((page - 1) * page_size).limit(page_size)]
+            return [get_transaction_dict(transaction) for transaction in 
+                   session.query(Transaction)
+                   .order_by(Transaction.id.desc())
+                   .offset((page - 1) * page_size)
+                   .limit(page_size)]
 
     @staticmethod
     def get_transactions_values_by_author(author: str) -> List[Transaction]:
-        """Get all transactions by a specific author."""
+        """Get all transactions by a specific author, ordered by ID in descending order (newest first)."""
         with get_db_session() as session:
-            return [get_transaction_dict(transaction) for transaction in session.query(Transaction).filter(Transaction.author == author).all()]
+            return [get_transaction_dict(transaction) for transaction in 
+                   session.query(Transaction)
+                   .filter(Transaction.author == author)
+                   .order_by(Transaction.id.desc())
+                   .all()]
         
     @staticmethod
     def update_transaction(transaction_id: int, **kwargs) -> bool:
