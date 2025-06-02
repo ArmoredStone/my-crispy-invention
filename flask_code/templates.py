@@ -1,5 +1,143 @@
 from typing import Final
 
+CREATE_TRANSACTION_TEMPLATE: Final = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Transaction</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .form-container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: #ff0000;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .success {
+            color: #4CAF50;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <a href="/list" class="back-link">&larr; Back to Transactions</a>
+    <h1>Create New Transaction</h1>
+    
+    <div class="form-container">
+        <form id="createTransactionForm" onsubmit="handleSubmit(event)">
+            <div class="form-group">
+                <label for="author">Author:</label>
+                <input type="text" id="author" name="author" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="prompt">Prompt:</label>
+                <textarea id="prompt" name="prompt" required></textarea>
+            </div>
+            
+            <button type="submit">Create Transaction</button>
+        </form>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        async function handleSubmit(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const messageDiv = document.getElementById('message');
+            
+            const formData = {
+                author: form.author.value.trim(),
+                prompt: form.prompt.value.trim()
+            };
+
+            try {
+                const response = await fetch('/api/create_transaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    messageDiv.className = 'success';
+                    messageDiv.textContent = 'Transaction completed successfully!';
+                    form.reset();
+                    // Redirect to transactions page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/list';
+                    }, 3000);
+                } else {
+                    const error = await response.json();
+                    messageDiv.className = 'error';
+                    messageDiv.textContent = error.message || 'Failed to create transaction';
+                }
+            } catch (error) {
+                messageDiv.className = 'error';
+                messageDiv.textContent = 'An error occurred while creating the transaction';
+            }
+        }
+    </script>
+</body>
+</html>
+"""
+
 # HTML template for rendering transactions
 TRANSACTIONS_TEMPLATE: Final = """
 <!DOCTYPE html>
@@ -57,6 +195,7 @@ TRANSACTIONS_TEMPLATE: Final = """
 </head>
 <body>
     <h1>Transactions</h1>
+    <a href="/create" class="create-link">Create New Transaction</a>
     
     <div class="page-size-selector">
         <label for="page-size">Items per page:</label>

@@ -1,13 +1,15 @@
 from flask import Blueprint, jsonify, render_template_string, request, abort
 from database.crud import TransactionCRUD
-from flask_code.templates import TRANSACTIONS_TEMPLATE
+from flask_code.templates import TRANSACTIONS_TEMPLATE, CREATE_TRANSACTION_TEMPLATE
 from database.database import get_db_session
 from database.sqlalchemy_models import Transaction
+from api_calls.transaction_handler import TransactionHandler
+import json
 
 routes = Blueprint('routes', __name__)
 
-@routes.route('/')
-def index():
+@routes.route('/list')
+def list_route():
     """Render all transactions in a paged table format"""
     # Validate and set page parameters with reasonable limits
     try:
@@ -46,22 +48,30 @@ def index():
         allowed_page_sizes=allowed_page_sizes
     )
 
-@routes.route('/api/transactions')
-def get_transactions():
-    """API endpoint to get all transactions as JSON"""
-    transactions = TransactionCRUD.get_all_transactions_values()
-    return jsonify(transactions)
+@routes.route('/create')
+def create_route():
+    """Render the create transaction page"""
+    return render_template_string(CREATE_TRANSACTION_TEMPLATE)
 
-@routes.route('/api/transactions/<int:transaction_id>')
-def get_transaction(transaction_id):
-    """API endpoint to get a specific transaction by ID"""
-    transaction = TransactionCRUD.get_transaction_values(transaction_id)
-    if transaction:
-        return jsonify(transaction)
-    return jsonify({"error": "Transaction not found"}), 404
-
-@routes.route('/api/transactions/author/<author>')
-def get_transactions_by_author(author):
-    """API endpoint to get transactions by author"""
-    transactions = TransactionCRUD.get_transactions_values_by_author(author)
-    return jsonify(transactions)
+@routes.route('/api/create_transaction', methods=['POST'])
+def create_transaction():
+    """API endpoint to create a new transaction"""
+    data = request.json
+    
+    prompt = data['prompt'].strip()
+    if not prompt:
+        return jsonify({"error": "Prompt is required"}), 400
+    
+    author = data['author'].strip()
+    if not author:
+        return jsonify({"error": "Author is required"}), 400
+    
+    transaction_handler = TransactionHandler(author=author, prompt=prompt)
+    success = transaction_handler.execute()
+    if success:
+        transaction = TransactionCRUD.get_transaction_values(transaction_handler.transaction_id)
+        print(transaction)
+        print(f"Transaction completed successfully!")
+    else:
+        print("Transaction failed to complete")
+    return jsonify(transaction)
