@@ -6,8 +6,9 @@ routes = Blueprint('routes', __name__)
 
 @routes.route('/')
 def index():
-    """Render all transactions in a table format"""
-    transactions = TransactionCRUD.get_all_transactions_values()
+    """Render all transactions in a paged table format"""
+    transactions = TransactionCRUD.get_all_transactions_values()[::-1]
+    # transactions = TransactionCRUD.get_all_transactions_values_by_page(page=1, page_size=10)[::-1]
     return render_template_string(TRANSACTIONS_TEMPLATE, transactions=transactions)
 
 @routes.route('/api/transactions')

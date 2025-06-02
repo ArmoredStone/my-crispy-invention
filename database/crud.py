@@ -25,7 +25,13 @@ class TransactionCRUD:
         """Get all transactions."""
         with get_db_session() as session:
             return [get_transaction_dict(transaction) for transaction in session.query(Transaction).all()]
-        
+    
+    @staticmethod
+    def get_all_transactions_values_by_page(page: int, page_size: int) -> List[Transaction]:
+        """Get all transactions by page."""
+        with get_db_session() as session:
+            return [get_transaction_dict(transaction) for transaction in session.query(Transaction).offset((page - 1) * page_size).limit(page_size)]
+
     @staticmethod
     def get_transactions_values_by_author(author: str) -> List[Transaction]:
         """Get all transactions by a specific author."""
@@ -40,12 +46,11 @@ class TransactionCRUD:
             if transaction:
                 for key, value in kwargs.items():
                     if hasattr(transaction, key):
-                        print(f"Updating {key} to {value}")
                         setattr(transaction, key, value)
                 session.commit()
                 return True
             return False
-    
+
     @staticmethod
     def delete_transaction(transaction_id: int) -> bool:
         """Delete a transaction."""
